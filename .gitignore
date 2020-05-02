@@ -1,3 +1,7 @@
+*/build/*
+!*/
+!*/build/*.*
+
 # Prerequisites
 *.d
 
@@ -31,3 +35,4 @@
 *.out
 *.app
 
+.DS_Store

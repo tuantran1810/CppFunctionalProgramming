@@ -6,5 +6,5 @@ RUN apt-get update \
 	&& apt-get install -y libjsoncpp-dev \
 	&& apt-get install -y libcurl4-gnutls-dev \
 	&& apt-get install -y libssl-dev
-WORKDIR = /Source
+WORKDIR /Source
 
