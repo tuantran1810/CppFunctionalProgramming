@@ -10,7 +10,7 @@ struct Person {
     int age;
 
     Person(std::string name, bool isMale, int age): name(name), isMale(isMale), age(age) {}
-
+    int getAge() const { return age; }
     friend std::ostream& operator<<(std::ostream& os, const Person& p);
 };
 
@@ -71,15 +71,42 @@ private:
     int limit;
 };
 
+template <typename T>
+struct OlderThanTemplate {
+    OlderThanTemplate(int age): limit(age) {}
+    bool operator()(const T& obj) {
+        return obj.getAge() > limit;
+    }
+private:
+    int limit;
+};
+
+struct OlderThanTemplate2 {
+    OlderThanTemplate2(int age): limit(age) {}
+
+    template <typename T>
+    bool operator()(T&& obj) {
+        return std::forward<T>(obj).getAge() > limit;
+    }
+private:
+    int limit;
+};
+
 int main() {
     People people = { Person("Peter", true, 19), Person("Martha", false, 35), Person("Jane", false, 44),
                         Person("David", true, 50), Person("Rose", false, 35), Person("Tom", true, 17) };
     auto olderThan42 = OlderThan(42);
-    std::for_each(people.cbegin(), people.cend(), [olderThan42] (const auto& person) {
+    std::for_each(people.cbegin(), people.cend(), [&olderThan42] (const auto& person) {
         if (olderThan42(person)) {
             std::cout << person << " older than 42" << std::endl;
         }
     });
-    std::cout << "There are " << std::count_if(people.cbegin(), people.cend(), olderThan42) << " people older than 42" << std::endl;
+    std::cout << "There are " << std::count_if(people.cbegin(), people.cend(), OlderThan(42)) << " people older than 42" << std::endl;
+    std::cout << "There are " << std::count_if(people.cbegin(), people.cend(), OlderThanTemplate<Person>(42)) << " people older than 42" << std::endl;
+    std::cout << "There are " << std::count_if(people.cbegin(), people.cend(), OlderThanTemplate2(42)) << " people older than 42" << std::endl;
+    std::cout << "There are " << std::count_if(people.cbegin(), people.cend(), [limit = 42] (auto&& obj) {
+        return obj.getAge() > limit;
+    }) << " people older than 42" << std::endl;
     return 0;
 }
+
